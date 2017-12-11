@@ -143,6 +143,12 @@ class Action {
     static let DisablePasscodeTypeIncorrectPasscode = "DisablePasscodeTypeIncorrectPasscode"
 
     static let TogglePocketInNewTab = "TogglePocketInNewTab"
+    static let ToggleBookmarksInNewTab = "ToggleBookmarksInNewTab"
+    static let ToggleHistoryInNewTab = "ToggleHistoryInNewTab"
+
+    static let ShowBlankPage = "ShowBlankPage"
+    static let ShowBookmarksPage = "ShowBookmarksPage"
+    static let ShowHistoryPage = "ShowHistoryPage"
 
     static let AcceptClearPrivateData = "AcceptClearPrivateData"
 
@@ -191,6 +197,8 @@ class FxUserState: UserState {
     var nightMode = false
 
     var pocketInNewTab = false
+    var bookmarksInNewTab = true
+    var historyInNewTab = true
 
     var fxaUsername: String? = nil
     var fxaPassword: String? = nil
@@ -468,12 +476,29 @@ func createScreenGraph(for test: XCTestCase, with app: XCUIApplication) -> Scree
             userState.pocketInNewTab = !userState.pocketInNewTab
             table.switches["ASPocketStoriesVisible"].tap()
         }
+        screenState.gesture(forAction: Action.ToggleBookmarksInNewTab) { userState in
+            userState.bookmarksInNewTab = !userState.bookmarksInNewTab
+            table.switches["ASBookmarkHighlightsVisible"].tap()
+        }
+        screenState.gesture(forAction: Action.ToggleHistoryInNewTab) { userState in
+            userState.historyInNewTab = !userState.historyInNewTab
+            table.switches["ASRecentHighlightsVisible"].tap()
+        }
         screenState.backAction = navigationControllerBackAction
     }
 
     map.addScreenState(NewTabChoiceSettings) { screenState in
-        let table = app.tables.element(boundBy: 0)
+        let table = app.tables["NewTabPage.Setting.Options"]
         screenState.backAction = navigationControllerBackAction
+        screenState.gesture(forAction: Action.ShowBlankPage) { UserState in
+            table.cells.staticTexts["Show a Blank Page"].tap()
+        }
+        screenState.gesture(forAction: Action.ShowBookmarksPage) { UserState in
+            table.cells.staticTexts["Show your Bookmarks"].tap()
+        }
+        screenState.gesture(forAction: Action.ShowHistoryPage) { UserState in
+            table.cells.staticTexts["Show your History"].tap()
+        }
     }
 
     map.addScreenState(HomePageSettings) { screenState in
